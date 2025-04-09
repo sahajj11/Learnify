@@ -14,7 +14,7 @@ app.get("/",(req,res)=>{
     res.send("api working")
 })
 
-app.post("/clerk",express.json(),clerkWebHooks)
+app.post("/clerk",express.raw({ type: "application/json" }),clerkWebHooks)
 
 app.listen(PORT,(req,res)=>{
     console.log("server started")
