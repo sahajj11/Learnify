@@ -4,7 +4,7 @@ import User from "../models/User.js";
 export const clerkWebHooks = async (req, res) => {
   try {
     console.log("🔔 Webhook triggered!");
-    const whook = new Webhook(process.env.CLERK_WEBHHOOK_SECRET);
+    const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
     const evt = whook.verify(req.body, {
       "svix-id": req.headers["svix-id"],
