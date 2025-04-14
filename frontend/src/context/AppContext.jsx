@@ -1,17 +1,26 @@
 import { createContext, useEffect, useState } from "react";
 import { dummyCourses } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
-export const AppContext=createContext()
-import humanizeDuration from "humanize-duration"
 
+import humanizeDuration from "humanize-duration"
+import {useAuth,useUser} from "@clerk/clerk-react"
+
+
+export const AppContext=createContext()
 export const AppContextProvider=(props)=>{
 
     const currency=import.meta.env.VITE_CURRENCY
     const [allCourses,setAllCourses]=useState([])
     const navigate=useNavigate()
+
+    const {getToken}=useAuth()
+    const {user}=useUser()
+  
+  
     const [isEducator,setIsEducator]=useState(true)
     const [enrolledCourses,setEnrolledCourses]=useState([])
-  
+
+    
     const fetchAllCourses=()=>{
         setAllCourses(dummyCourses)
     }
@@ -67,6 +76,16 @@ export const AppContextProvider=(props)=>{
         fetchUserEnrolledCourses()
 
     },[])
+
+    const logToken=async()=>{
+        console.log(await getToken())
+    }
+
+    useEffect(()=>{
+        if(user){
+            logToken()
+        }
+    },[user])
 
     const value={
         currency,allCourses,navigate,calculateRating,isEducator,enrolledCourses,fetchUserEnrolledCourses,setIsEducator,calculateChapterTime,calculateCourseDuration,calculateNoOfLectures
