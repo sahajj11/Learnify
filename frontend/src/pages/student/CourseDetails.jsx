@@ -6,6 +6,8 @@ import humanizeDuration from "humanize-duration";
 import Footer from '../../components/student/Footer'
 import Loading from '../../components/student/Loading'
 import YouTube from "react-youtube";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const CourseDetails = () => {
   const { id } = useParams();
@@ -22,16 +24,60 @@ const CourseDetails = () => {
     calculateChapterTime,
     calculateCourseDuration,
     calculateNoOfLectures,
+    backendUrl,
+    ueserData,
+    getToken
   } = useContext(AppContext);
 
   const fetchCourseData = async () => {
-    const findCourse = allCourses.find((course) => course._id === id);
-    setCourseData(findCourse);
+    // const findCourse = allCourses.find((course) => course._id === id);
+    // setCourseData(findCourse);
+    try{
+      const {data}=axios.get(backendUrl + "/api/course/"+id)
+      if(data.success){
+        setCourseData(data.courseData)
+      }else{
+        toast.error(data.message)
+      }
+    }catch(error){
+      toast.error(error.message)
+    }
   };
+
+  //after back this below
+  const enrollCourse=async()=>{
+    try{
+      if(!ueserData){
+        return toast.warn("login to enroll")
+      }
+      if(isAlreadyEnrolled){
+        return toast.warn("already enroled")
+      }
+
+      const {data}=axios.get(backendUrl + "/api/user/purchase",{courseId:courseData._id},{headers:{Authorization:`Bearer ${token}`}})
+      if(data.success){
+        const {session_url}=data
+        window.location.replace(session_url)
+      }else{
+        toast.error(data.message)
+      }
+    }catch(error){
+      toast.error(error.message)
+    }
+
+  }
 
   useEffect(() => {
     fetchCourseData();
-  }, [allCourses]);
+  }, []);
+
+  useEffect(()=>{
+    if(ueserData && courseData){
+      setIsAlreadyEnroled(ueserData.enrolledCourses.includes(courseData._id))
+    }
+  },[ueserData,courseData])
+
+  //allCourses was above there before integr backen
 
   const toggleSection = (index) => {
     setOpenSections((prev) => ({ ...prev, [index]: !prev[index] }));
@@ -86,7 +132,7 @@ const CourseDetails = () => {
 
           <p className="text-sm">
             Course by{" "}
-            <span className="text-blue-600 underline">Great Stack</span>
+            <span className="text-blue-600 underline">{courseData.educator.name}</span>
           </p>
 
           <div className="pt-8 text-gray-800">
@@ -220,7 +266,7 @@ const CourseDetails = () => {
             </div>
 
 
-           <button className="md:mt-6 mt-4 w-full py-3 rounded bg-blue-600 text-white font-medium">{isAlreadyEnrolled?"Already Enrolled":"Enroll Now"}</button>
+           <button onClick={enrollCourse} className="md:mt-6 mt-4 w-full py-3 rounded bg-blue-600 text-white font-medium">{isAlreadyEnrolled?"Already Enrolled":"Enroll Now"}</button>
 
            <div className="pt-6">
             <p className="md:text-lg text-lg font-medium text-gray-800">What's in the course?</p>
