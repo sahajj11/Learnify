@@ -33,7 +33,7 @@ const CourseDetails = () => {
     // const findCourse = allCourses.find((course) => course._id === id);
     // setCourseData(findCourse);
     try{
-      const {data}=axios.get(backendUrl + "/api/course/"+id)
+      const {data}=await axios.get(backendUrl + "/api/course/"+id)
       if(data.success){
         setCourseData(data.courseData)
       }else{
@@ -54,7 +54,7 @@ const CourseDetails = () => {
         return toast.warn("already enroled")
       }
 
-      const {data}=axios.get(backendUrl + "/api/user/purchase",{courseId:courseData._id},{headers:{Authorization:`Bearer ${token}`}})
+      const {data}=await axios.get(backendUrl + "/api/user/purchase",{courseId:courseData._id},{headers:{Authorization:`Bearer ${token}`}})
       if(data.success){
         const {session_url}=data
         window.location.replace(session_url)
@@ -265,7 +265,6 @@ const CourseDetails = () => {
               </div>
             </div>
 
-
            <button onClick={enrollCourse} className="md:mt-6 mt-4 w-full py-3 rounded bg-blue-600 text-white font-medium">{isAlreadyEnrolled?"Already Enrolled":"Enroll Now"}</button>
 
            <div className="pt-6">
@@ -280,9 +279,6 @@ const CourseDetails = () => {
            </div>
 
           </div>
-
-
-
 
         </div>
       </div>

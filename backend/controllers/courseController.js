@@ -3,9 +3,10 @@ import Purchase from "../models/Purchase.js";
 
 //get all courses
 export const getAllCourse=async(req,res)=>{
-
+    console.log("🎯 Hit /api/course/all route");
     try{
-        const courses=await Course.find({isPublished:true}).select(["-courseContent","-enrolledStudents"]).populate({path:"educator"})
+        const courses=await Course.find({}).select(["-courseContent","-enrolledStudents"]).populate({path:"educator"})
+        console.log("📦 All Courses from DB:", courses);
 
         res.json({success:true,courses})
 
